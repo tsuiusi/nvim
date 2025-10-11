@@ -135,15 +135,15 @@ vim.wo.foldmethod = 'expr'
 vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
 
 -- Configure fold settings
-vim.opt.foldenable = false  -- Disable folding at startup
+vim.opt.foldenable = false -- Disable folding at startup
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 
 -- Function to enable folding and apply fold method
 local function enable_folding()
-    vim.wo.foldenable = true
-    vim.wo.foldmethod = 'expr'
-    vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+  vim.wo.foldenable = true
+  vim.wo.foldmethod = 'expr'
+  vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
 end
 
 -- Enable folding when entering a buffer, but keep everything unfolded
@@ -162,13 +162,12 @@ end
 -- })
 
 vim.api.nvim_create_user_command('IMG', function(opts)
-    local args = opts.args
-    local image_name = args:match("^(%S+)")
-    local extension = args:match("%s+(%S+)$") or "png"
-    local text = string.format("![%s](src/%s.%s)", image_name, image_name, extension)
-    vim.api.nvim_put({text}, 'c', true, true)
-end, {nargs = '+', desc = 'Insert markdown image syntax'})
-
+  local args = opts.args
+  local image_name = args:match '^(%S+)'
+  local extension = args:match '%s+(%S+)$' or 'png'
+  local text = string.format('![%s](src/%s.%s)', image_name, image_name, extension)
+  vim.api.nvim_put({ text }, 'c', true, true)
+end, { nargs = '+', desc = 'Insert markdown image syntax' })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -182,11 +181,11 @@ vim.opt.rtp:prepend(lazypath)
 -- Templates for my code
 -- Define the functions
 local function read_file(path)
-  local file = io.open(path, "r")
+  local file = io.open(path, 'r')
   if not file then
     return nil
   end
-  local content = file:read("*all")
+  local content = file:read '*all'
   file:close()
   return content
 end
@@ -194,31 +193,31 @@ end
 local function insert_template(template_path)
   local content = read_file(template_path)
   if content then
-    vim.api.nvim_put(vim.split(content, "\n"), "", false, true)
+    vim.api.nvim_put(vim.split(content, '\n'), '', false, true)
   else
-    print("Template file not found: " .. template_path)
+    print('Template file not found: ' .. template_path)
   end
 end
 
 -- Create user commands
-vim.api.nvim_create_user_command("MLX", function()
-  insert_template(vim.fn.expand("~/.config/nvim/templates/mlx.py"))
+vim.api.nvim_create_user_command('MLX', function()
+  insert_template(vim.fn.expand '~/.config/nvim/templates/mlx.py')
 end, {})
 
-vim.api.nvim_create_user_command("MLXC", function()
-  insert_template(vim.fn.expand("~/.config/nvim/templates/MLXC.py"))
+vim.api.nvim_create_user_command('MLXC', function()
+  insert_template(vim.fn.expand '~/.config/nvim/templates/MLXC.py')
 end, {})
 
-vim.api.nvim_create_user_command("TORCH", function()
-  insert_template(vim.fn.expand("~/.config/nvim/templates/torch.py"))
+vim.api.nvim_create_user_command('TORCH', function()
+  insert_template(vim.fn.expand '~/.config/nvim/templates/torch.py')
 end, {})
 
-vim.api.nvim_create_user_command("HTML", function()
-  insert_template(vim.fn.expand("~/.config/nvim/templates/template.html"))
+vim.api.nvim_create_user_command('HTML', function()
+  insert_template(vim.fn.expand '~/.config/nvim/templates/template.html')
 end, {})
 
-vim.api.nvim_create_user_command("TEX", function()
-  insert_template(vim.fn.expand("~/.config/nvim/templates/template.tex"))
+vim.api.nvim_create_user_command('TEX', function()
+  insert_template(vim.fn.expand '~/.config/nvim/templates/template.tex')
 end, {})
 
 -- [[ Configure and install plugins ]]
@@ -232,7 +231,7 @@ end, {})
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
-require('lazy').setup({
+require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -319,7 +318,6 @@ require('lazy').setup({
   -- Then, because we use the `config` key, the configuration only runs
   -- after the plugin has been loaded:
   --  config = function() ... end
-
 
   -- NOTE: Plugins can specify dependencies.
   --
@@ -621,7 +619,20 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        tsserver = {
+          settings = {
+            typescript = {
+              format = {
+                enable = false, -- Disable tsserver formatting, use conform instead
+              },
+            },
+            javascript = {
+              format = {
+                enable = false, -- Disable tsserver formatting, use conform instead
+              },
+            },
+          },
+        },
         --
 
         lua_ls = {
@@ -632,6 +643,9 @@ require('lazy').setup({
             Lua = {
               completion = {
                 callSnippet = 'Replace',
+              },
+              format = {
+                enable = false, -- Disable lua_ls formatting, use conform instead
               },
               -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
               -- diagnostics = { disable = { 'missing-fields' } },
@@ -825,10 +839,10 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
-    "catppuccin/nvim",
+    'catppuccin/nvim',
     -- "ellisonleao/gruvbox.nvim",
     -- name = "gruvbox",
-    name = "catppuccin",
+    name = 'catppuccin',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -971,24 +985,37 @@ require('lazy').setup({
     end,
   },
   {
-    "yacineMTB/pyrepl.nvim",
+    'yacineMTB/pyrepl.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
-      require("pyrepl").setup({
-        url = "http://localhost:5000/execute"
-      })
+      require('pyrepl').setup {
+        url = 'http://localhost:5000/execute',
+      }
     end,
     keys = {
-      { "<leader>p", function() require('pyrepl').run_selected_lines() end, mode = "v", desc = "Run selected lines" }
-    }
+      {
+        '<leader>p',
+        function()
+          require('pyrepl').run_selected_lines()
+        end,
+        mode = 'v',
+        desc = 'Run selected lines',
+      },
+    },
   },
   {
-    "jbyuki/nabla.nvim",
-    config = function()
-    end,
+    'jbyuki/nabla.nvim',
+    config = function() end,
     keys = {
-      { "<leader>rm", function() require('nabla').popup() end, mode = "n", desc = "nabla popup" }
-    }
+      {
+        '<leader>rm',
+        function()
+          require('nabla').popup()
+        end,
+        mode = 'n',
+        desc = 'nabla popup',
+      },
+    },
   },
   {
     'saghen/blink.cmp',
@@ -1022,7 +1049,7 @@ require('lazy').setup({
       appearance = {
         -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
         -- Adjusts spacing to ensure icons are aligned
-        nerd_font_variant = 'mono'
+        nerd_font_variant = 'mono',
       },
 
       -- (Default) Only show the documentation popup when manually triggered
@@ -1039,9 +1066,45 @@ require('lazy').setup({
       -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
       --
       -- See the fuzzy documentation for more information
-      fuzzy = { implementation = "prefer_rust_with_warning" }
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
     },
-    opts_extend = { "sources.default" }
+    opts_extend = { 'sources.default' },
+  },
+  {
+    'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_fallback = true }
+        end,
+        desc = 'Format buffer',
+      },
+    },
+    opts = {
+      formatters_by_ft = {
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        json = { 'jq' },
+        jsonl = { 'jq' },
+        python = { 'black' },
+        lua = { 'stylua' },
+      },
+      formatters = {
+        prettier = {
+          prepend_args = { '--print-width=999', '--tab-width=4', '--use-tabs=false' },
+        },
+        black = {
+          prepend_args = { '--line-length=999', '--indent-width=4' },
+        },
+        stylua = {
+          prepend_args = { '--indent-type=Spaces', '--indent-width=4', '--column-width=999' },
+        },
+      },
+      format_on_save = { timeout_ms = 500, lsp_fallback = true },
+    },
   },
   {
     'yacineMTB/dingllm.nvim',
@@ -1119,8 +1182,8 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 'v' }, '<leader>I', anthropic_help, { desc = 'llm anthropic_help' })
       vim.keymap.set({ 'n', 'v' }, '<leader>i', anthropic_replace, { desc = 'llm anthropic' })
     end,
-  { import = 'custom.plugins' },
-  }, 
+    { import = 'custom.plugins' },
+  },
   -- {
   --   ui = {
   --   -- If you are using a Nerd Font: set icons to an empty table which will use the
@@ -1141,8 +1204,37 @@ require('lazy').setup({
   --     lazy = '💤 ',
   --   },
   -- },
-})
+  {
+    'lervag/vimtex',
+    lazy = false,
+    config = function()
+      -- Viewer settings
+      vim.g.vimtex_view_method = 'general'
+      vim.g.vimtex_compiler_method = 'latexmk'
 
+      -- Additional settings
+      vim.g.vimtex_quickfix_mode = 0
+      vim.g.vimtex_mappings_enabled = 0
+      vim.g.vimtex_indent_enabled = 1
+      vim.g.vimtex_syntax_enabled = 1
+      vim.g.vimtex_view_automatic = 1
+      vim.g.vimtex_complete_enabled = 1
+
+      -- Keymaps for LaTeX
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'tex',
+        callback = function()
+          vim.keymap.set('n', '<leader>ll', '<cmd>VimtexCompile<CR>', { buffer = true, desc = 'Start compilation' })
+          vim.keymap.set('n', '<leader>lk', '<cmd>VimtexStop<CR>', { buffer = true, desc = 'Stop compilation' })
+          vim.keymap.set('n', '<leader>lv', '<cmd>VimtexView<CR>', { buffer = true, desc = 'View PDF' })
+          vim.keymap.set('n', '<leader>lc', '<cmd>VimtexClean<CR>', { buffer = true, desc = 'Clean aux files' })
+          vim.keymap.set('n', '<leader>le', '<cmd>VimtexErrors<CR>', { buffer = true, desc = 'Show errors' })
+          vim.keymap.set('n', '<leader>lt', '<cmd>VimtexTocToggle<CR>', { buffer = true, desc = 'Toggle TOC' })
+        end,
+      })
+    end,
+  },
+}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
