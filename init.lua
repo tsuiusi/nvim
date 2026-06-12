@@ -590,20 +590,14 @@ require('lazy').setup {
       --
       --
       -- Setup sourcekit with filetype detection for objective-c
-      -- Setup sourcekit with filetype detection for objective-c
-      require('lspconfig')['sourcekit'].setup {
+      vim.lsp.config('sourcekit', {
         capabilities = capabilities,
         cmd = {
           '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp',
         },
-        root_dir = function(filename, _)
-          local util = require 'lspconfig.util'
-          return util.root_pattern 'buildServer.json'(filename)
-            or util.root_pattern('*.xcodeproj', '*.xcworkspace')(filename)
-            or util.find_git_ancestor(filename)
-            or util.root_pattern 'Package.swift'(filename)
-        end,
-      }
+        root_markers = { 'buildServer.json', '*.xcodeproj', '*.xcworkspace', '.git', 'Package.swift' },
+      })
+      vim.lsp.enable('sourcekit')
 
       vim.api.nvim_command 'autocmd FileType objc setlocal filetype=objective-c'
       vim.api.nvim_command 'autocmd FileType objective-c setlocal syntax=objc'
@@ -670,17 +664,14 @@ require('lazy').setup {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- Register each server with vim.lsp.config (nvim 0.11+)
+      for server_name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(server_name, server)
+      end
+
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = true,
       }
     end,
   },
@@ -916,15 +907,18 @@ require('lazy').setup {
 
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
 
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      -- Install specified parsers
+      require('nvim-treesitter').install(opts.ensure_installed)
+
+      -- Enable treesitter-based highlighting and indentation (built-in on nvim 0.12+)
+      vim.api.nvim_create_autocmd('FileType', {
+        callback = function(args)
+          if pcall(vim.treesitter.start, args.buf) then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
     end,
   },
 
